@@ -9,6 +9,7 @@ DISPLAY_HEIGHT = 600
 FPS = 60
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
+COLOUR_BLUE = (0, 0, 255)
 CAR_X_SPEED = 5
 
 pygame.init()
@@ -22,10 +23,15 @@ clock = pygame.time.Clock()
 car_img = pygame.image.load('racecar.png')
 
 def draw_block(block_rect):
-    pygame.draw.rect(game_display, COLOUR_BLACK, block_rect)
+    pygame.draw.rect(game_display, COLOUR_BLUE, block_rect)
 
 def draw_car(car_rect):
     game_display.blit(car_img, car_rect)
+
+def draw_blocks_dodged(count):
+    font = pygame.font.SysFont(None, 25)
+    text = font.render(f'Dodged: {count}', True, COLOUR_BLACK)
+    game_display.blit(text, (0, 0))
 
 def crash():
     message_display('You Crashed')
@@ -62,7 +68,9 @@ def game_loop():
     block_pos_left = random.randrange(0, DISPLAY_WIDTH - block_width)
     block_pos_top = -3 * block_height
     block_rect = pygame.Rect(block_pos_left, block_pos_top, block_width, block_height)
-    block_speed = 7
+    block_speed = 4
+
+    dodged = 0
 
     while True:
 
@@ -95,8 +103,14 @@ def game_loop():
 
         # Block below display
         if block_rect.top > DISPLAY_HEIGHT:
+            # Increment score
+            dodged += 1
+            # Increase difficulty
+            block_speed += 0.3
+            block_rect.inflate_ip(5, 0)
+            # Reset block
             block_rect.top = 0 - block_height
-            block_rect.left = random.randrange(0, DISPLAY_WIDTH - block_width)
+            block_rect.left = random.randrange(0, DISPLAY_WIDTH - block_rect.width)
 
         # Car and block collide
         if car_rect.colliderect(block_rect):
@@ -107,6 +121,7 @@ def game_loop():
         game_display.fill(COLOUR_WHITE)
         draw_car(car_rect)
         draw_block(block_rect)
+        draw_blocks_dodged(dodged)
 
         pygame.display.update()
 
