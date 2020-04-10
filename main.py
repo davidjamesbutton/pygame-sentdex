@@ -16,9 +16,9 @@ COLOUR_WHITE = (255, 255, 255)
 DISPLAY_CAPTION = 'A bit Racey'
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
-FONT_INTRO_BUTTONS = pygame.font.Font('freesansbold.ttf', 20)
-FONT_LARGE_MESSAGE = pygame.font.Font('freesansbold.ttf', 115)
-FONT_SCORE = pygame.font.SysFont(None, 25)
+FONT_INTRO_BUTTONS = pygame.font.SysFont('comicsansms', 20)
+FONT_LARGE_MESSAGE = pygame.font.SysFont('comicsansms', 115)
+FONT_SCORE = pygame.font.SysFont('comicsansms', 25)
 FPS = 60
 
 pygame.display.set_caption(DISPLAY_CAPTION)
