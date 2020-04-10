@@ -119,8 +119,10 @@ def game_loop():
         block_rect.move_ip(0, block_speed)
 
         # Car outside display
-        if car_rect.right > DISPLAY_WIDTH or car_rect.left < 0:
-            crash()
+        if car_rect.right > DISPLAY_WIDTH:
+            car_rect.right = DISPLAY_WIDTH
+        if car_rect.left <  0:
+            car_rect.left = 0
 
         # Block below display
         if block_rect.top > DISPLAY_HEIGHT:
