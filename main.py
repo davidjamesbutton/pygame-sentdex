@@ -3,20 +3,23 @@ import random
 import time
 import threading
 
+pygame.init()
+
+CAR_X_SPEED = 5
+COLOUR_BLACK = (0, 0, 0)
+COLOUR_BLUE = (0, 0, 255)
+COLOUR_DARK_GREEN = (0, 200, 0)
+COLOUR_DARK_RED = (200, 0, 0)
+COLOUR_GREEN = (0, 255, 0)
+COLOUR_RED = (255, 0, 0)
+COLOUR_WHITE = (255, 255, 255)
 DISPLAY_CAPTION = 'A bit Racey'
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
+FONT_INTRO_BUTTONS = pygame.font.Font('freesansbold.ttf', 20)
+FONT_LARGE_MESSAGE = pygame.font.Font('freesansbold.ttf', 115)
+FONT_SCORE = pygame.font.SysFont(None, 25)
 FPS = 60
-COLOUR_BLACK = (0, 0, 0)
-COLOUR_WHITE = (255, 255, 255)
-COLOUR_BLUE = (0, 0, 255)
-COLOUR_GREEN = (0, 255, 0)
-COLOUR_RED = (255, 0, 0)
-COLOUR_DARK_RED = (200, 0, 0)
-COLOUR_DARK_GREEN = (0, 200, 0)
-CAR_X_SPEED = 5
-
-pygame.init()
 
 pygame.display.set_caption(DISPLAY_CAPTION)
 
@@ -36,8 +39,7 @@ def draw_car(car_rect):
     game_display.blit(car_img, car_rect)
 
 def draw_score(count):
-    font = pygame.font.SysFont(None, 25)
-    text = font.render(f'Score: {count}', True, COLOUR_BLACK)
+    text = FONT_SCORE.render(f'Score: {count}', True, COLOUR_BLACK)
     game_display.blit(text, (0, 0))
 
 def crash():
@@ -56,8 +58,7 @@ def run_sync(func):
     thread.join()
 
 def draw_large_message(text):
-    font = pygame.font.Font('freesansbold.ttf', 115)
-    text_surface = font.render(text, True, COLOUR_BLACK)
+    text_surface = FONT_LARGE_MESSAGE.render(text, True, COLOUR_BLACK)
     text_rect = text_surface.get_rect()
     text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
     game_display.blit(text_surface, text_rect)
@@ -91,9 +92,8 @@ def game_intro():
     button1_rect = pygame.Rect(150, 450, button_width, button_height)
     button2_rect = pygame.Rect(550, 450, button_width, button_height)
 
-    font = pygame.font.Font('freesansbold.ttf', 20)
-    button1_text_surface = font.render('Start', True, COLOUR_BLACK)
-    button2_text_surface = font.render('Exit', True, COLOUR_BLACK)
+    button1_text_surface = FONT_INTRO_BUTTONS.render('Start', True, COLOUR_BLACK)
+    button2_text_surface = FONT_INTRO_BUTTONS.render('Exit', True, COLOUR_BLACK)
 
     intro = True
 
@@ -136,8 +136,7 @@ def game_loop():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                game_quit()
 
         keys = pygame.key.get_pressed()
 
