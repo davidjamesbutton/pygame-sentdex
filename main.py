@@ -85,14 +85,24 @@ def game_loop():
 
         car_pos_left += car_x_change
 
+        block_pos_top += block_speed
+
+        # Car outside display
         if car_pos_left + car_img.get_width() > DISPLAY_WIDTH or car_pos_left < 0:
             crash()
 
-        block_pos_top += block_speed
-
+        # Block below display
         if block_pos_top > DISPLAY_HEIGHT:
             block_pos_top = 0 - block_height
             block_pos_left = random.randrange(0, DISPLAY_WIDTH - block_width)
+
+        # Car and block collide
+        if car_pos_top < block_pos_top + block_height:
+            if  car_pos_left > block_pos_left \
+            and car_pos_left < block_pos_left + block_width \
+            or car_pos_left + car_img.get_width() > block_pos_left \
+            and car_pos_left + car_img.get_width() < block_pos_left + block_width:
+                crash()
 
         ### DRAW GAME STATE
 
