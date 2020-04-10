@@ -21,11 +21,11 @@ clock = pygame.time.Clock()
 
 car_img = pygame.image.load('racecar.png')
 
-def draw_block(left, top, width, height):
-    pygame.draw.rect(game_display, COLOUR_BLACK, [left, top, width, height])
+def draw_block(block_rect):
+    pygame.draw.rect(game_display, COLOUR_BLACK, block_rect)
 
-def draw_car(left, top):
-    game_display.blit(car_img, (left, top))
+def draw_car(car_rect):
+    game_display.blit(car_img, car_rect)
 
 def crash():
     message_display('You Crashed')
@@ -53,13 +53,15 @@ def text_objects(text, font):
     return text_surface, text_surface.get_rect()
 
 def game_loop():
-    car_pos_left = 0.5 * (DISPLAY_WIDTH - car_img.get_width())
-    car_pos_top = DISPLAY_HEIGHT - 1.5 * car_img.get_height()
+    car_rect = car_img.get_rect()
+    car_rect.top = DISPLAY_HEIGHT - 1.5 * car_rect.height
+    car_rect.centerx = DISPLAY_WIDTH / 2
 
     block_width = 100
     block_height = 100
     block_pos_left = random.randrange(0, DISPLAY_WIDTH - block_width)
     block_pos_top = -3 * block_height
+    block_rect = pygame.Rect(block_pos_left, block_pos_top, block_width, block_height)
     block_speed = 7
 
     while True:
@@ -83,32 +85,28 @@ def game_loop():
 
         ### UPDATE GAME STATE
 
-        car_pos_left += car_x_change
+        car_rect.move_ip(car_x_change, 0)
 
-        block_pos_top += block_speed
+        block_rect.move_ip(0, block_speed)
 
         # Car outside display
-        if car_pos_left + car_img.get_width() > DISPLAY_WIDTH or car_pos_left < 0:
+        if car_rect.right > DISPLAY_WIDTH or car_rect.left < 0:
             crash()
 
         # Block below display
-        if block_pos_top > DISPLAY_HEIGHT:
-            block_pos_top = 0 - block_height
-            block_pos_left = random.randrange(0, DISPLAY_WIDTH - block_width)
+        if block_rect.top > DISPLAY_HEIGHT:
+            block_rect.top = 0 - block_height
+            block_rect.left = random.randrange(0, DISPLAY_WIDTH - block_width)
 
         # Car and block collide
-        if car_pos_top < block_pos_top + block_height:
-            if  car_pos_left > block_pos_left \
-            and car_pos_left < block_pos_left + block_width \
-            or car_pos_left + car_img.get_width() > block_pos_left \
-            and car_pos_left + car_img.get_width() < block_pos_left + block_width:
-                crash()
+        if car_rect.colliderect(block_rect):
+            crash()
 
         ### DRAW GAME STATE
 
         game_display.fill(COLOUR_WHITE)
-        draw_car(car_pos_left, car_pos_top)
-        draw_block(block_pos_left, block_pos_top, block_width, block_height)
+        draw_car(car_rect)
+        draw_block(block_rect)
 
         pygame.display.update()
 
