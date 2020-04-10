@@ -37,9 +37,11 @@ def draw_score(count):
     game_display.blit(text, (0, 0))
 
 def crash():
+    draw_large_message('You crashed!')
+
     # Run synchronously to ensure display has updated before pausing
     # https://stackoverflow.com/questions/55881619/sleep-doesnt-work-where-it-is-desired-to/55882173
-    run_sync(lambda: draw_large_message('You crashed!'))
+    run_sync(lambda: pygame.display.update())
 
     time.sleep(2)
     game_loop()
@@ -55,7 +57,27 @@ def draw_large_message(text):
     text_rect = text_surface.get_rect()
     text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
     game_display.blit(text_surface, text_rect)
-    pygame.display.update()
+
+def game_intro():
+    intro = True
+
+    while intro:
+
+        for event in pygame.event.get():
+            print(event)
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    intro = False
+
+        draw_background()
+        draw_large_message(DISPLAY_CAPTION)
+
+        pygame.display.update()
+        clock.tick(15)
+
 
 def game_loop():
     car_rect = car_img.get_rect()
@@ -126,4 +148,5 @@ def game_loop():
 
         clock.tick(FPS)
 
+game_intro()
 game_loop()
