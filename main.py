@@ -9,7 +9,7 @@ DISPLAY_HEIGHT = 600
 FPS = 60
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
-X_SPEED = 5
+CAR_X_SPEED = 5
 
 pygame.init()
 
@@ -21,11 +21,11 @@ clock = pygame.time.Clock()
 
 car_img = pygame.image.load('racecar.png')
 
-def block(x, y, width, height, colour):
-    pygame.draw.rect(game_display, colour, [x, y, width, height])
+def draw_block(left, top, width, height):
+    pygame.draw.rect(game_display, COLOUR_BLACK, [left, top, width, height])
 
-def car(x, y):
-    game_display.blit(car_img, (x, y))
+def draw_car(left, top):
+    game_display.blit(car_img, (left, top))
 
 def crash():
     message_display('You Crashed')
@@ -53,16 +53,18 @@ def text_objects(text, font):
     return text_surface, text_surface.get_rect()
 
 def game_loop():
-    x = 0.5 * (DISPLAY_WIDTH - car_img.get_width())
-    y = DISPLAY_HEIGHT - 1.5 * car_img.get_height()
+    car_pos_left = 0.5 * (DISPLAY_WIDTH - car_img.get_width())
+    car_pos_top = DISPLAY_HEIGHT - 1.5 * car_img.get_height()
 
-    block_x = random.randrange(0, DISPLAY_WIDTH)
-    block_y = -600
-    block_speed = 7
     block_width = 100
     block_height = 100
+    block_pos_left = random.randrange(0, DISPLAY_WIDTH - block_width)
+    block_pos_top = -3 * block_height
+    block_speed = 7
 
     while True:
+
+        ### HANDLE INPUT EVENTS
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -72,27 +74,31 @@ def game_loop():
 
         keys = pygame.key.get_pressed()
 
-        x_change = 0
+        car_x_change = 0
 
         if keys[pygame.K_LEFT]:
-            x_change -= X_SPEED
+            car_x_change -= CAR_X_SPEED
         if keys[pygame.K_RIGHT]:
-            x_change += X_SPEED
+            car_x_change += CAR_X_SPEED
 
-        x += x_change
+        ### UPDATE GAME STATE
 
-        if x + car_img.get_width() > DISPLAY_WIDTH or x < 0:
+        car_pos_left += car_x_change
+
+        if car_pos_left + car_img.get_width() > DISPLAY_WIDTH or car_pos_left < 0:
             crash()
 
-        block_y += block_speed
+        block_pos_top += block_speed
 
-        if block_y > DISPLAY_HEIGHT:
-            block_y = 0 - block_height
-            block_x = random.randrange(0, DISPLAY_WIDTH)
+        if block_pos_top > DISPLAY_HEIGHT:
+            block_pos_top = 0 - block_height
+            block_pos_left = random.randrange(0, DISPLAY_WIDTH - block_width)
+
+        ### DRAW GAME STATE
 
         game_display.fill(COLOUR_WHITE)
-        car(x, y)
-        block(block_x, block_y, block_width, block_height, COLOUR_BLACK)
+        draw_car(car_pos_left, car_pos_top)
+        draw_block(block_pos_left, block_pos_top, block_width, block_height)
 
         pygame.display.update()
 
