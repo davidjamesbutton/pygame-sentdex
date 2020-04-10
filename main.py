@@ -22,41 +22,40 @@ clock = pygame.time.Clock()
 
 car_img = pygame.image.load('racecar.png')
 
+def draw_background():
+    game_display.fill(COLOUR_WHITE)
+
 def draw_block(block_rect):
     pygame.draw.rect(game_display, COLOUR_BLUE, block_rect)
 
 def draw_car(car_rect):
     game_display.blit(car_img, car_rect)
 
-def draw_blocks_dodged(count):
+def draw_score(count):
     font = pygame.font.SysFont(None, 25)
-    text = font.render(f'Dodged: {count}', True, COLOUR_BLACK)
+    text = font.render(f'Score: {count}', True, COLOUR_BLACK)
     game_display.blit(text, (0, 0))
 
 def crash():
-    message_display('You Crashed')
+    # Run synchronously to ensure display has updated before pausing
+    # https://stackoverflow.com/questions/55881619/sleep-doesnt-work-where-it-is-desired-to/55882173
+    run_sync(lambda: draw_large_message('You crashed!'))
+
+    time.sleep(2)
+    game_loop()
 
 def run_sync(func):
     thread = threading.Thread(target=func)
     thread.start()
     thread.join()
 
-def message_display(text):
-    large_text = pygame.font.Font('freesansbold.ttf', 115)
-    text_surf, text_rect = text_objects(text, large_text)
-    text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
-    game_display.blit(text_surf, text_rect)
-
-    # Run synchronously to ensure display has updated before pausing
-    # https://stackoverflow.com/questions/55881619/sleep-doesnt-work-where-it-is-desired-to/55882173
-    run_sync(lambda: pygame.display.update())
-
-    time.sleep(2)
-    game_loop()
-
-def text_objects(text, font):
+def draw_large_message(text):
+    font = pygame.font.Font('freesansbold.ttf', 115)
     text_surface = font.render(text, True, COLOUR_BLACK)
-    return text_surface, text_surface.get_rect()
+    text_rect = text_surface.get_rect()
+    text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
+    game_display.blit(text_surface, text_rect)
+    pygame.display.update()
 
 def game_loop():
     car_rect = car_img.get_rect()
@@ -70,7 +69,7 @@ def game_loop():
     block_rect = pygame.Rect(block_pos_left, block_pos_top, block_width, block_height)
     block_speed = 4
 
-    dodged = 0
+    score = 0
 
     while True:
 
@@ -104,7 +103,7 @@ def game_loop():
         # Block below display
         if block_rect.top > DISPLAY_HEIGHT:
             # Increment score
-            dodged += 1
+            score += 1
             # Increase difficulty
             block_speed += 0.3
             block_rect.inflate_ip(5, 0)
@@ -118,10 +117,10 @@ def game_loop():
 
         ### DRAW GAME STATE
 
-        game_display.fill(COLOUR_WHITE)
+        draw_background()
         draw_car(car_rect)
         draw_block(block_rect)
-        draw_blocks_dodged(dodged)
+        draw_score(score)
 
         pygame.display.update()
 
