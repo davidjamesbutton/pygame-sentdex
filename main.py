@@ -29,8 +29,8 @@ clock = pygame.time.Clock()
 
 car_img = pygame.image.load('racecar.png')
 
-def draw_background():
-    game_display.fill(COLOUR_WHITE)
+def draw_background(colour):
+    game_display.fill(colour)
 
 def draw_block(block_rect):
     pygame.draw.rect(game_display, COLOUR_BLUE, block_rect)
@@ -86,6 +86,23 @@ def game_quit():
     pygame.quit()
     quit()
 
+def pause():
+    paused = True
+    while paused:
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    paused = False
+
+        draw_background(COLOUR_WHITE)
+        draw_large_message("Paused")
+
+        pygame.display.update()
+        clock.tick(FPS)
+
 def game_intro():
     button_width = 100
     button_height = 50
@@ -106,7 +123,7 @@ def game_intro():
                 if event.key == pygame.K_SPACE:
                     intro = False
 
-        draw_background()
+        draw_background(COLOUR_WHITE)
         draw_large_message(DISPLAY_CAPTION)
 
         button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, game_loop)
@@ -137,6 +154,9 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_quit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_p:
+                    pause()
 
         keys = pygame.key.get_pressed()
 
@@ -176,7 +196,7 @@ def game_loop():
 
         ### DRAW GAME STATE
 
-        draw_background()
+        draw_background(COLOUR_WHITE)
         draw_car(car_rect)
         draw_block(block_rect)
         draw_score(score)
@@ -186,4 +206,3 @@ def game_loop():
         clock.tick(FPS)
 
 game_intro()
-game_loop()
