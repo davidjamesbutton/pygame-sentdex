@@ -10,6 +10,10 @@ FPS = 60
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
 COLOUR_BLUE = (0, 0, 255)
+COLOUR_GREEN = (0, 255, 0)
+COLOUR_RED = (255, 0, 0)
+COLOUR_DARK_RED = (200, 0, 0)
+COLOUR_DARK_GREEN = (0, 200, 0)
 CAR_X_SPEED = 5
 
 pygame.init()
@@ -58,16 +62,46 @@ def draw_large_message(text):
     text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
     game_display.blit(text_surface, text_rect)
 
+def button(text_surf, button_rect, colour, hover_colour, action=None):
+    mouse_pos = pygame.mouse.get_pos()
+    mouse_pressed = pygame.mouse.get_pressed()
+
+    # Button was clicked
+    if mouse_pressed[0] == 1 and button_rect.collidepoint(mouse_pos):
+        if action is not None:
+            action()
+
+    button_colour = colour
+    # Mouse hovered button
+    if button_rect.collidepoint(mouse_pos):
+        button_colour = hover_colour
+    pygame.draw.rect(game_display, button_colour, button_rect)
+
+    text_rect = text_surf.get_rect()
+    text_rect.center = button_rect.center
+    game_display.blit(text_surf, text_rect)
+
+def game_quit():
+    pygame.quit()
+    quit()
+
 def game_intro():
+    button_width = 100
+    button_height = 50
+    button1_rect = pygame.Rect(150, 450, button_width, button_height)
+    button2_rect = pygame.Rect(550, 450, button_width, button_height)
+
+    font = pygame.font.Font('freesansbold.ttf', 20)
+    button1_text_surface = font.render('Start', True, COLOUR_BLACK)
+    button2_text_surface = font.render('Exit', True, COLOUR_BLACK)
+
     intro = True
 
     while intro:
 
         for event in pygame.event.get():
-            print(event)
             if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
+                game_quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE:
                     intro = False
@@ -75,8 +109,11 @@ def game_intro():
         draw_background()
         draw_large_message(DISPLAY_CAPTION)
 
+        button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, game_loop)
+        button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+
         pygame.display.update()
-        clock.tick(15)
+        clock.tick(FPS)
 
 
 def game_loop():
@@ -101,7 +138,6 @@ def game_loop():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
-            # print(event)
 
         keys = pygame.key.get_pressed()
 
