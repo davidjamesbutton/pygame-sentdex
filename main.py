@@ -24,7 +24,6 @@ def car(x, y):
 def game_loop():
     x = 0.5 * (DISPLAY_WIDTH - car_img.get_width())
     y = DISPLAY_HEIGHT - 1.5 * car_img.get_height()
-    x_change = 0
 
     game_running = True
 
@@ -33,19 +32,16 @@ def game_loop():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_running = False
-
-            # TO DO: Fix car getting stuck when overlapping fast key presses
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_LEFT:
-                    x_change = -X_SPEED
-                if event.key == pygame.K_RIGHT:
-                    x_change = X_SPEED
-
-            if event.type == pygame.KEYUP:
-                if event.key == pygame.K_LEFT or event.key == pygame.K_RIGHT:
-                    x_change = 0
-
             # print(event)
+
+        keys = pygame.key.get_pressed()
+
+        x_change = 0
+
+        if keys[pygame.K_LEFT]:
+            x_change -= X_SPEED
+        if keys[pygame.K_RIGHT]:
+            x_change += X_SPEED
 
         x += x_change
 
