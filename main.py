@@ -1,4 +1,5 @@
 import pygame
+import random
 import time
 import threading
 
@@ -19,6 +20,9 @@ game_display = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
 clock = pygame.time.Clock()
 
 car_img = pygame.image.load('racecar.png')
+
+def block(x, y, width, height, colour):
+    pygame.draw.rect(game_display, colour, [x, y, width, height])
 
 def car(x, y):
     game_display.blit(car_img, (x, y))
@@ -52,6 +56,12 @@ def game_loop():
     x = 0.5 * (DISPLAY_WIDTH - car_img.get_width())
     y = DISPLAY_HEIGHT - 1.5 * car_img.get_height()
 
+    block_x = random.randrange(0, DISPLAY_WIDTH)
+    block_y = -600
+    block_speed = 7
+    block_width = 100
+    block_height = 100
+
     while True:
 
         for event in pygame.event.get():
@@ -74,8 +84,15 @@ def game_loop():
         if x + car_img.get_width() > DISPLAY_WIDTH or x < 0:
             crash()
 
+        block_y += block_speed
+
+        if block_y > DISPLAY_HEIGHT:
+            block_y = 0 - block_height
+            block_x = random.randrange(0, DISPLAY_WIDTH)
+
         game_display.fill(COLOUR_WHITE)
         car(x, y)
+        block(block_x, block_y, block_width, block_height, COLOUR_BLACK)
 
         pygame.display.update()
 
