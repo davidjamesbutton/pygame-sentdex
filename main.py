@@ -21,7 +21,7 @@ FPS = 60
 pygame.init()
 
 # Load resources from disk
-car_img = pygame.image.load('assets/race_car.png')
+image_car = pygame.image.load('assets/race_car.png')
 font_small = pygame.font.SysFont(FONT_NAME, 25)
 font_large = pygame.font.SysFont(FONT_NAME, 115)
 sound_crash = pygame.mixer.Sound('assets/crash_sfx.wav')
@@ -32,39 +32,38 @@ pygame.mixer.music.set_volume(0.5)
 # Setup window
 pygame.display.set_caption(DISPLAY_CAPTION)
 
-game_display = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
+display_surface = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
-car_icon = pygame.transform.scale(car_img, (32, 32))
-pygame.display.set_icon(car_icon)
+icon_car = pygame.transform.scale(image_car, (32, 32))
+pygame.display.set_icon(icon_car)
 
 clock = pygame.time.Clock()
 
 
-def draw_background(colour):
-    game_display.fill(colour)
+def draw_background_colour(colour):
+    display_surface.fill(colour)
 
-def draw_block(block_rect):
-    pygame.draw.rect(game_display, COLOUR_BLUE, block_rect)
+def draw_blue_block(block_rect):
+    pygame.draw.rect(display_surface, COLOUR_BLUE, block_rect)
 
 def draw_car(car_rect):
-    game_display.blit(car_img, car_rect)
+    display_surface.blit(image_car, car_rect)
 
 def draw_score(count):
-    text = font_small.render(f'Score: {count}', True, COLOUR_BLACK)
-    game_display.blit(text, (0, 0))
+    text_surface = font_small.render(f'Score: {count}', True, COLOUR_BLACK)
+    display_surface.blit(text_surface, (0, 0))
 
 def draw_large_message(text):
     text_surface = font_large.render(text, True, COLOUR_BLACK)
     text_rect = text_surface.get_rect()
     text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
-    game_display.blit(text_surface, text_rect)
+    display_surface.blit(text_surface, text_rect)
 
-def draw_button(text_surf, button_rect, colour, hover_colour, action=None):
+def draw_button(text_surface, button_rect, colour, hover_colour, action=None):
     mouse_pos = pygame.mouse.get_pos()
-    mouse_pressed = pygame.mouse.get_pressed()
 
     # Button was clicked
-    if mouse_pressed[0] == 1 and button_rect.collidepoint(mouse_pos):
+    if left_button_is_pressed() and button_rect.collidepoint(mouse_pos):
         if action is not None:
             action()
 
@@ -72,20 +71,36 @@ def draw_button(text_surf, button_rect, colour, hover_colour, action=None):
     # Mouse hovered button
     if button_rect.collidepoint(mouse_pos):
         button_colour = hover_colour
-    pygame.draw.rect(game_display, button_colour, button_rect)
+    pygame.draw.rect(display_surface, button_colour, button_rect)
 
-    text_rect = text_surf.get_rect()
+    text_rect = text_surface.get_rect()
     text_rect.center = button_rect.center
-    game_display.blit(text_surf, text_rect)
+    display_surface.blit(text_surface, text_rect)
+
+def left_button_is_pressed():
+    return pygame.mouse.get_pressed()[0] == 1
+
+def pause_music():
+    pygame.mixer.music.pause()
+
+def resume_music():
+    pygame.mixer.music.unpause()
+
+def stop_music():
+    pygame.mixer.music.stop()
+
+def play_music():
+    pygame.mixer.music.play(-1)
 
 def game_quit():
     pygame.quit()
     quit()
 
 def pause_scene():
-    pygame.mixer.music.pause()
+    pause_music()
 
     paused = True
+
     while paused:
 
         for event in pygame.event.get():
@@ -95,25 +110,26 @@ def pause_scene():
                 if event.key == pygame.K_p:
                     paused = False
 
-        draw_background(COLOUR_WHITE)
+        draw_background_colour(COLOUR_WHITE)
         draw_large_message("Paused")
 
         pygame.display.update()
         clock.tick(FPS)
 
-    pygame.mixer.music.unpause()
+    resume_music()
 
 def crash_scene():
-    pygame.mixer.music.stop()
+    stop_music()
     pygame.mixer.Sound.play(sound_crash)
 
     button_width = 100
     button_height = 50
-    button1_rect = pygame.Rect(150, 450, button_width, button_height)
-    button2_rect = pygame.Rect(550, 450, button_width, button_height)
 
-    button1_text_surface = font_small.render('Play again', True, COLOUR_BLACK)
-    button2_text_surface = font_small.render('Exit', True, COLOUR_BLACK)
+    play_again_button_rect = pygame.Rect(150, 450, button_width, button_height)
+    play_again_button_surface = font_small.render('Play again', True, COLOUR_BLACK)
+
+    exit_button_rect = pygame.Rect(550, 450, button_width, button_height)
+    exit_button_surface = font_small.render('Exit', True, COLOUR_BLACK)
 
     while True:
         for event in pygame.event.get():
@@ -121,8 +137,9 @@ def crash_scene():
                 game_quit()
 
         draw_large_message('You crashed!')
-        draw_button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
-        draw_button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+
+        draw_button(play_again_button_surface, play_again_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
+        draw_button(exit_button_surface, exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
@@ -130,37 +147,32 @@ def crash_scene():
 def menu_scene():
     button_width = 100
     button_height = 50
-    button1_rect = pygame.Rect(150, 450, button_width, button_height)
-    button2_rect = pygame.Rect(550, 450, button_width, button_height)
 
-    button1_text_surface = font_small.render('Start', True, COLOUR_BLACK)
-    button2_text_surface = font_small.render('Exit', True, COLOUR_BLACK)
+    start_button_rect = pygame.Rect(150, 450, button_width, button_height)
+    start_button_text_surface = font_small.render('Start', True, COLOUR_BLACK)
 
-    intro = True
+    exit_button_rect = pygame.Rect(550, 450, button_width, button_height)
+    exit_button_text_surface = font_small.render('Exit', True, COLOUR_BLACK)
 
-    while intro:
+    while True:
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_quit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_SPACE:
-                    intro = False
 
-        draw_background(COLOUR_WHITE)
+        draw_background_colour(COLOUR_WHITE)
         draw_large_message(DISPLAY_CAPTION)
 
-        draw_button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
-        draw_button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+        draw_button(start_button_text_surface, start_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
+        draw_button(exit_button_text_surface, exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
 
-
 def driving_scene():
-    pygame.mixer.music.play(-1)
+    play_music()
 
-    car_rect = car_img.get_rect()
+    car_rect = image_car.get_rect()
     car_rect.top = DISPLAY_HEIGHT - 1.5 * car_rect.height
     car_rect.centerx = DISPLAY_WIDTH / 2
 
@@ -222,9 +234,9 @@ def driving_scene():
 
         ### DRAW GAME STATE
 
-        draw_background(COLOUR_WHITE)
+        draw_background_colour(COLOUR_WHITE)
         draw_car(car_rect)
-        draw_block(block_rect)
+        draw_blue_block(block_rect)
         draw_score(score)
 
         pygame.display.update()
