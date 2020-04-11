@@ -1,8 +1,8 @@
 import pygame
 import random
 
-pygame.init()
 
+# Constants
 CAR_X_SPEED = 5
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_BLUE = (0, 0, 255)
@@ -14,26 +14,31 @@ COLOUR_WHITE = (255, 255, 255)
 DISPLAY_CAPTION = 'A bit Racey'
 DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
-FONT_INTRO_BUTTONS = pygame.font.SysFont('comicsansms', 20)
-FONT_LARGE_MESSAGE = pygame.font.SysFont('comicsansms', 115)
-FONT_SCORE = pygame.font.SysFont('comicsansms', 25)
+FONT_NAME = 'comicsansms'
 FPS = 60
 
+
+pygame.init()
+
+# Load resources from disk
+car_img = pygame.image.load('assets/race_car.png')
+font_small = pygame.font.SysFont(FONT_NAME, 25)
+font_large = pygame.font.SysFont(FONT_NAME, 115)
+sound_crash = pygame.mixer.Sound('assets/crash_sfx.wav')
+pygame.mixer.music.load('assets/background_music.wav')
+pygame.mixer.music.set_volume(0.5)
+
+
+# Setup window
 pygame.display.set_caption(DISPLAY_CAPTION)
 
 game_display = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
-clock = pygame.time.Clock()
-
-car_img = pygame.image.load('race_car.png')
-
 car_icon = pygame.transform.scale(car_img, (32, 32))
 pygame.display.set_icon(car_icon)
 
-sound_crash = pygame.mixer.Sound('crash.wav')
+clock = pygame.time.Clock()
 
-pygame.mixer.music.load('music.wav')
-pygame.mixer.music.set_volume(0.5)
 
 def draw_background(colour):
     game_display.fill(colour)
@@ -45,11 +50,11 @@ def draw_car(car_rect):
     game_display.blit(car_img, car_rect)
 
 def draw_score(count):
-    text = FONT_SCORE.render(f'Score: {count}', True, COLOUR_BLACK)
+    text = font_small.render(f'Score: {count}', True, COLOUR_BLACK)
     game_display.blit(text, (0, 0))
 
 def draw_large_message(text):
-    text_surface = FONT_LARGE_MESSAGE.render(text, True, COLOUR_BLACK)
+    text_surface = font_large.render(text, True, COLOUR_BLACK)
     text_rect = text_surface.get_rect()
     text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
     game_display.blit(text_surface, text_rect)
@@ -107,8 +112,8 @@ def crash_scene():
     button1_rect = pygame.Rect(150, 450, button_width, button_height)
     button2_rect = pygame.Rect(550, 450, button_width, button_height)
 
-    button1_text_surface = FONT_INTRO_BUTTONS.render('Play again', True, COLOUR_BLACK)
-    button2_text_surface = FONT_INTRO_BUTTONS.render('Exit', True, COLOUR_BLACK)
+    button1_text_surface = font_small.render('Play again', True, COLOUR_BLACK)
+    button2_text_surface = font_small.render('Exit', True, COLOUR_BLACK)
 
     while True:
         for event in pygame.event.get():
@@ -128,8 +133,8 @@ def menu_scene():
     button1_rect = pygame.Rect(150, 450, button_width, button_height)
     button2_rect = pygame.Rect(550, 450, button_width, button_height)
 
-    button1_text_surface = FONT_INTRO_BUTTONS.render('Start', True, COLOUR_BLACK)
-    button2_text_surface = FONT_INTRO_BUTTONS.render('Exit', True, COLOUR_BLACK)
+    button1_text_surface = font_small.render('Start', True, COLOUR_BLACK)
+    button2_text_surface = font_small.render('Exit', True, COLOUR_BLACK)
 
     intro = True
 
@@ -226,4 +231,5 @@ def driving_scene():
 
         clock.tick(FPS)
 
-menu_scene()
+if __name__ == '__main__':
+    menu_scene()
