@@ -1,5 +1,6 @@
 import pygame
 import random
+import music
 
 
 # Constants
@@ -27,8 +28,7 @@ image_car = pygame.image.load('assets/race_car.png')
 font_small = pygame.font.SysFont(FONT_NAME, 25)
 font_large = pygame.font.SysFont(FONT_NAME, 115)
 sound_crash = pygame.mixer.Sound('assets/crash_sfx.wav')
-pygame.mixer.music.load('assets/background_music.wav')
-pygame.mixer.music.set_volume(0.5)
+music.load('assets/background_music.wav')
 
 
 # Setup window
@@ -87,24 +87,12 @@ def draw_button(text, button_rect, colour, hover_colour, action=None):
 def left_button_is_pressed():
     return pygame.mouse.get_pressed()[0] == 1
 
-def pause_music():
-    pygame.mixer.music.pause()
-
-def resume_music():
-    pygame.mixer.music.unpause()
-
-def stop_music():
-    pygame.mixer.music.stop()
-
-def play_music():
-    pygame.mixer.music.play(-1)
-
 def game_quit():
     pygame.quit()
     quit()
 
 def pause_scene():
-    pause_music()
+    music.pause()
 
     paused = True
 
@@ -123,10 +111,10 @@ def pause_scene():
         pygame.display.update()
         clock.tick(FPS)
 
-    resume_music()
+    music.resume()
 
 def crash_scene():
-    stop_music()
+    music.stop()
     pygame.mixer.Sound.play(sound_crash)
 
     play_again_button_rect = pygame.Rect(150, 450, BUTTON_WIDTH, BUTTON_HEIGHT)
@@ -166,7 +154,7 @@ def menu_scene():
         clock.tick(FPS)
 
 def driving_scene():
-    play_music()
+    music.play()
 
     car_rect = image_car.get_rect()
     car_rect.top = DISPLAY_HEIGHT - 1.5 * car_rect.height
