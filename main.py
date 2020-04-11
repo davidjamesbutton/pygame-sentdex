@@ -25,10 +25,15 @@ game_display = pygame.display.set_mode((DISPLAY_WIDTH, DISPLAY_HEIGHT))
 
 clock = pygame.time.Clock()
 
-car_img = pygame.image.load('racecar.png')
+car_img = pygame.image.load('race_car.png')
 
 car_icon = pygame.transform.scale(car_img, (32, 32))
 pygame.display.set_icon(car_icon)
+
+sound_crash = pygame.mixer.Sound('crash.wav')
+
+pygame.mixer.music.load('music.wav')
+pygame.mixer.music.set_volume(0.5)
 
 def draw_background(colour):
     game_display.fill(colour)
@@ -73,6 +78,8 @@ def game_quit():
     quit()
 
 def pause_scene():
+    pygame.mixer.music.pause()
+
     paused = True
     while paused:
 
@@ -89,7 +96,12 @@ def pause_scene():
         pygame.display.update()
         clock.tick(FPS)
 
+    pygame.mixer.music.unpause()
+
 def crash_scene():
+    pygame.mixer.music.stop()
+    pygame.mixer.Sound.play(sound_crash)
+
     button_width = 100
     button_height = 50
     button1_rect = pygame.Rect(150, 450, button_width, button_height)
@@ -141,6 +153,8 @@ def menu_scene():
 
 
 def driving_scene():
+    pygame.mixer.music.play(-1)
+
     car_rect = car_img.get_rect()
     car_rect.top = DISPLAY_HEIGHT - 1.5 * car_rect.height
     car_rect.centerx = DISPLAY_WIDTH / 2
