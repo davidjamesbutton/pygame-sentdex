@@ -43,14 +43,25 @@ def draw_score(count):
     game_display.blit(text, (0, 0))
 
 def crash():
-    draw_large_message('You crashed!')
+    button_width = 100
+    button_height = 50
+    button1_rect = pygame.Rect(150, 450, button_width, button_height)
+    button2_rect = pygame.Rect(550, 450, button_width, button_height)
 
-    # Run synchronously to ensure display has updated before pausing
-    # https://stackoverflow.com/questions/55881619/sleep-doesnt-work-where-it-is-desired-to/55882173
-    run_sync(lambda: pygame.display.update())
+    button1_text_surface = FONT_INTRO_BUTTONS.render('Play again', True, COLOUR_BLACK)
+    button2_text_surface = FONT_INTRO_BUTTONS.render('Exit', True, COLOUR_BLACK)
 
-    time.sleep(2)
-    game_loop()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_quit()
+
+        draw_large_message('You crashed!')
+        button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, game_loop)
+        button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+
+        pygame.display.update()
+        clock.tick(FPS)
 
 def run_sync(func):
     thread = threading.Thread(target=func)
