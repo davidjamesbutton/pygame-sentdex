@@ -1,7 +1,5 @@
 import pygame
 import random
-import time
-import threading
 
 pygame.init()
 
@@ -42,39 +40,13 @@ def draw_score(count):
     text = FONT_SCORE.render(f'Score: {count}', True, COLOUR_BLACK)
     game_display.blit(text, (0, 0))
 
-def crash():
-    button_width = 100
-    button_height = 50
-    button1_rect = pygame.Rect(150, 450, button_width, button_height)
-    button2_rect = pygame.Rect(550, 450, button_width, button_height)
-
-    button1_text_surface = FONT_INTRO_BUTTONS.render('Play again', True, COLOUR_BLACK)
-    button2_text_surface = FONT_INTRO_BUTTONS.render('Exit', True, COLOUR_BLACK)
-
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game_quit()
-
-        draw_large_message('You crashed!')
-        button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, game_loop)
-        button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
-
-        pygame.display.update()
-        clock.tick(FPS)
-
-def run_sync(func):
-    thread = threading.Thread(target=func)
-    thread.start()
-    thread.join()
-
 def draw_large_message(text):
     text_surface = FONT_LARGE_MESSAGE.render(text, True, COLOUR_BLACK)
     text_rect = text_surface.get_rect()
     text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
     game_display.blit(text_surface, text_rect)
 
-def button(text_surf, button_rect, colour, hover_colour, action=None):
+def draw_button(text_surf, button_rect, colour, hover_colour, action=None):
     mouse_pos = pygame.mouse.get_pos()
     mouse_pressed = pygame.mouse.get_pressed()
 
@@ -97,7 +69,7 @@ def game_quit():
     pygame.quit()
     quit()
 
-def pause():
+def pause_scene():
     paused = True
     while paused:
 
@@ -114,7 +86,28 @@ def pause():
         pygame.display.update()
         clock.tick(FPS)
 
-def game_intro():
+def crash_scene():
+    button_width = 100
+    button_height = 50
+    button1_rect = pygame.Rect(150, 450, button_width, button_height)
+    button2_rect = pygame.Rect(550, 450, button_width, button_height)
+
+    button1_text_surface = FONT_INTRO_BUTTONS.render('Play again', True, COLOUR_BLACK)
+    button2_text_surface = FONT_INTRO_BUTTONS.render('Exit', True, COLOUR_BLACK)
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                game_quit()
+
+        draw_large_message('You crashed!')
+        draw_button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
+        draw_button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+
+        pygame.display.update()
+        clock.tick(FPS)
+
+def menu_scene():
     button_width = 100
     button_height = 50
     button1_rect = pygame.Rect(150, 450, button_width, button_height)
@@ -137,14 +130,14 @@ def game_intro():
         draw_background(COLOUR_WHITE)
         draw_large_message(DISPLAY_CAPTION)
 
-        button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, game_loop)
-        button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+        draw_button(button1_text_surface, button1_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
+        draw_button(button2_text_surface, button2_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
 
 
-def game_loop():
+def driving_scene():
     car_rect = car_img.get_rect()
     car_rect.top = DISPLAY_HEIGHT - 1.5 * car_rect.height
     car_rect.centerx = DISPLAY_WIDTH / 2
@@ -167,7 +160,7 @@ def game_loop():
                 game_quit()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_p:
-                    pause()
+                    pause_scene()
 
         keys = pygame.key.get_pressed()
 
@@ -203,7 +196,7 @@ def game_loop():
 
         # Car and block collide
         if car_rect.colliderect(block_rect):
-            crash()
+            crash_scene()
 
         ### DRAW GAME STATE
 
@@ -216,4 +209,4 @@ def game_loop():
 
         clock.tick(FPS)
 
-game_intro()
+menu_scene()
