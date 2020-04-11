@@ -27,6 +27,9 @@ clock = pygame.time.Clock()
 
 car_img = pygame.image.load('racecar.png')
 
+car_icon = pygame.transform.scale(car_img, (32, 32))
+pygame.display.set_icon(car_icon)
+
 def draw_background(colour):
     game_display.fill(colour)
 
