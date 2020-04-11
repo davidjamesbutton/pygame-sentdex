@@ -3,6 +3,8 @@ import random
 
 
 # Constants
+BUTTON_HEIGHT = 50
+BUTTON_WIDTH = 100
 CAR_X_SPEED = 5
 COLOUR_BLACK = (0, 0, 0)
 COLOUR_BLUE = (0, 0, 255)
@@ -12,8 +14,8 @@ COLOUR_GREEN = (0, 255, 0)
 COLOUR_RED = (255, 0, 0)
 COLOUR_WHITE = (255, 255, 255)
 DISPLAY_CAPTION = 'A bit Racey'
-DISPLAY_WIDTH = 800
 DISPLAY_HEIGHT = 600
+DISPLAY_WIDTH = 800
 FONT_NAME = 'comicsansms'
 FPS = 60
 
@@ -49,17 +51,24 @@ def draw_blue_block(block_rect):
 def draw_car(car_rect):
     display_surface.blit(image_car, car_rect)
 
-def draw_score(count):
-    text_surface = font_small.render(f'Score: {count}', True, COLOUR_BLACK)
-    display_surface.blit(text_surface, (0, 0))
-
-def draw_large_message(text):
-    text_surface = font_large.render(text, True, COLOUR_BLACK)
+def draw_text_with_center(text, font, center):
+    text_surface = font.render(text, True, COLOUR_BLACK)
     text_rect = text_surface.get_rect()
-    text_rect.center = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
+    text_rect.center = center
     display_surface.blit(text_surface, text_rect)
 
-def draw_button(text_surface, button_rect, colour, hover_colour, action=None):
+def draw_text_with_upperleft(text, font, upper_left):
+    text_surface = font.render(text, True, COLOUR_BLACK)
+    display_surface.blit(text_surface, upper_left)
+
+def draw_score(count):
+    draw_text_with_upperleft(f'Score: {count}', font_small, (0, 0))
+
+def draw_large_centered_msg(text):
+    center_pos = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
+    draw_text_with_center(text, font_large, center_pos)
+
+def draw_button(text, button_rect, colour, hover_colour, action=None):
     mouse_pos = pygame.mouse.get_pos()
 
     # Button was clicked
@@ -73,9 +82,7 @@ def draw_button(text_surface, button_rect, colour, hover_colour, action=None):
         button_colour = hover_colour
     pygame.draw.rect(display_surface, button_colour, button_rect)
 
-    text_rect = text_surface.get_rect()
-    text_rect.center = button_rect.center
-    display_surface.blit(text_surface, text_rect)
+    draw_text_with_center(text, font_small, button_rect.center)
 
 def left_button_is_pressed():
     return pygame.mouse.get_pressed()[0] == 1
@@ -111,7 +118,7 @@ def pause_scene():
                     paused = False
 
         draw_background_colour(COLOUR_WHITE)
-        draw_large_message("Paused")
+        draw_large_centered_msg("Paused")
 
         pygame.display.update()
         clock.tick(FPS)
@@ -122,37 +129,26 @@ def crash_scene():
     stop_music()
     pygame.mixer.Sound.play(sound_crash)
 
-    button_width = 100
-    button_height = 50
-
-    play_again_button_rect = pygame.Rect(150, 450, button_width, button_height)
-    play_again_button_surface = font_small.render('Play again', True, COLOUR_BLACK)
-
-    exit_button_rect = pygame.Rect(550, 450, button_width, button_height)
-    exit_button_surface = font_small.render('Exit', True, COLOUR_BLACK)
+    play_again_button_rect = pygame.Rect(150, 450, BUTTON_WIDTH, BUTTON_HEIGHT)
+    exit_button_rect = pygame.Rect(550, 450, BUTTON_WIDTH, BUTTON_HEIGHT)
 
     while True:
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 game_quit()
 
-        draw_large_message('You crashed!')
+        draw_large_centered_msg('You crashed!')
 
-        draw_button(play_again_button_surface, play_again_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
-        draw_button(exit_button_surface, exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+        draw_button('Play again', play_again_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
+        draw_button('Exit', exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
 
 def menu_scene():
-    button_width = 100
-    button_height = 50
-
-    start_button_rect = pygame.Rect(150, 450, button_width, button_height)
-    start_button_text_surface = font_small.render('Start', True, COLOUR_BLACK)
-
-    exit_button_rect = pygame.Rect(550, 450, button_width, button_height)
-    exit_button_text_surface = font_small.render('Exit', True, COLOUR_BLACK)
+    start_button_rect = pygame.Rect(150, 450, BUTTON_WIDTH, BUTTON_HEIGHT)
+    exit_button_rect = pygame.Rect(550, 450, BUTTON_WIDTH, BUTTON_HEIGHT)
 
     while True:
 
@@ -161,10 +157,10 @@ def menu_scene():
                 game_quit()
 
         draw_background_colour(COLOUR_WHITE)
-        draw_large_message(DISPLAY_CAPTION)
+        draw_large_centered_msg(DISPLAY_CAPTION)
 
-        draw_button(start_button_text_surface, start_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
-        draw_button(exit_button_text_surface, exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+        draw_button('Start', start_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
+        draw_button('Exit', exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
