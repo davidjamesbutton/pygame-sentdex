@@ -1,19 +1,13 @@
+import colour
+import music
 import pygame
 import random
-import music
 
 
 # Constants
 BUTTON_HEIGHT = 50
 BUTTON_WIDTH = 100
 CAR_X_SPEED = 5
-COLOUR_BLACK = (0, 0, 0)
-COLOUR_BLUE = (0, 0, 255)
-COLOUR_DARK_GREEN = (0, 200, 0)
-COLOUR_DARK_RED = (200, 0, 0)
-COLOUR_GREEN = (0, 255, 0)
-COLOUR_RED = (255, 0, 0)
-COLOUR_WHITE = (255, 255, 255)
 DISPLAY_CAPTION = 'A bit Racey'
 DISPLAY_HEIGHT = 600
 DISPLAY_WIDTH = 800
@@ -42,23 +36,23 @@ pygame.display.set_icon(icon_car)
 clock = pygame.time.Clock()
 
 
-def draw_background_colour(colour):
-    display_surface.fill(colour)
+def draw_background_colour(background_colour):
+    display_surface.fill(background_colour)
 
 def draw_blue_block(block_rect):
-    pygame.draw.rect(display_surface, COLOUR_BLUE, block_rect)
+    pygame.draw.rect(display_surface, colour.BLUE, block_rect)
 
 def draw_car(car_rect):
     display_surface.blit(image_car, car_rect)
 
 def draw_text_with_center(text, font, center):
-    text_surface = font.render(text, True, COLOUR_BLACK)
+    text_surface = font.render(text, True, colour.BLACK)
     text_rect = text_surface.get_rect()
     text_rect.center = center
     display_surface.blit(text_surface, text_rect)
 
 def draw_text_with_upperleft(text, font, upper_left):
-    text_surface = font.render(text, True, COLOUR_BLACK)
+    text_surface = font.render(text, True, colour.BLACK)
     display_surface.blit(text_surface, upper_left)
 
 def draw_score(count):
@@ -68,7 +62,7 @@ def draw_large_centered_msg(text):
     center_pos = (DISPLAY_WIDTH / 2, DISPLAY_HEIGHT / 2)
     draw_text_with_center(text, font_large, center_pos)
 
-def draw_button(text, button_rect, colour, hover_colour, action=None):
+def draw_button(text, button_rect, default_colour, hover_colour, action=None):
     mouse_pos = pygame.mouse.get_pos()
 
     # Button was clicked
@@ -76,7 +70,7 @@ def draw_button(text, button_rect, colour, hover_colour, action=None):
         if action is not None:
             action()
 
-    button_colour = colour
+    button_colour = default_colour
     # Mouse hovered button
     if button_rect.collidepoint(mouse_pos):
         button_colour = hover_colour
@@ -105,7 +99,7 @@ def pause_scene():
                 if event.key == pygame.K_p:
                     paused = False
 
-        draw_background_colour(COLOUR_WHITE)
+        draw_background_colour(colour.WHITE)
         draw_large_centered_msg("Paused")
 
         pygame.display.update()
@@ -128,8 +122,8 @@ def crash_scene():
 
         draw_large_centered_msg('You crashed!')
 
-        draw_button('Play again', play_again_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
-        draw_button('Exit', exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+        draw_button('Play again', play_again_button_rect, colour.DARK_GREEN, colour.GREEN, driving_scene)
+        draw_button('Exit', exit_button_rect, colour.DARK_RED, colour.RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
@@ -144,11 +138,11 @@ def menu_scene():
             if event.type == pygame.QUIT:
                 game_quit()
 
-        draw_background_colour(COLOUR_WHITE)
+        draw_background_colour(colour.WHITE)
         draw_large_centered_msg(DISPLAY_CAPTION)
 
-        draw_button('Start', start_button_rect, COLOUR_DARK_GREEN, COLOUR_GREEN, driving_scene)
-        draw_button('Exit', exit_button_rect, COLOUR_DARK_RED, COLOUR_RED, game_quit)
+        draw_button('Start', start_button_rect, colour.DARK_GREEN, colour.GREEN, driving_scene)
+        draw_button('Exit', exit_button_rect, colour.DARK_RED, colour.RED, game_quit)
 
         pygame.display.update()
         clock.tick(FPS)
@@ -218,7 +212,7 @@ def driving_scene():
 
         ### DRAW GAME STATE
 
-        draw_background_colour(COLOUR_WHITE)
+        draw_background_colour(colour.WHITE)
         draw_car(car_rect)
         draw_blue_block(block_rect)
         draw_score(score)
